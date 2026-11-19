@@ -7,16 +7,72 @@ public class Main {
     public static void main(String[] args) {
         Scanner kb = new Scanner(System.in);
         Map<String, Schedule> schedules = new LinkedHashMap<>();
+        Map<String, User> users = new LinkedHashMap<>();
+        User currentUser = null;
         boolean running = true;
 
         while (running) {
+            if (currentUser == null) {
+                System.out.println("\n 1. LogIn");
+                System.out.println(" 2. SignUp");
+                System.out.println(" 0. Exit");
+                System.out.print("Choice: ");
+                String option = kb.nextLine().trim();
+
+                try {
+                    switch (option) {
+                        case "1":
+                            System.out.print("Enter your User ID: ");
+                            String userId = kb.nextLine().trim();
+                            if (userId.isEmpty()) {
+                                throw new IllegalArgumentException("User ID is required.");
+                            }
+                            currentUser = users.get(userId);
+                            if (currentUser == null) {
+                                System.out.println("User ID not found. Please sign up first.");
+                                break;
+                            }
+                            System.out.println("Welcome back, " + currentUser.getUserId() + "!");
+                            break;
+                        case "2":
+                            System.out.print("Enter a new User ID: ");
+                            String newUserId = kb.nextLine().trim();
+                            if (newUserId.isEmpty()) {
+                                throw new IllegalArgumentException("User ID is required.");
+                            }
+                            if (users.containsKey(newUserId)) {
+                                System.out.println("User ID already exists. Please choose a different one.");
+                                break;
+                            }
+                            currentUser = new User(newUserId);
+                            users.put(newUserId, currentUser);
+                            System.out.println("User created successfully! Welcome, " + currentUser.getUserId() + "!");
+                            break;
+                        case "0":
+                            running = false;
+                            break;
+                        default:
+                            System.out.println("Choose 0, 1, or 2.");
+                    }
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid input: " + e.getMessage());
+                }
+
+                if (!running) {
+                    break;
+                }
+                if (currentUser == null) {
+                    continue;
+                }
+            }
+
             System.out.println("\n1. Add/select professional");
             System.out.println("2. Make availability");
             System.out.println("3. View all availability");
             System.out.println("4. Import from CSV");
             System.out.println("5. Export to CSV");
             System.out.println("6. Book appointment");
-            // System.out.println("7. Search Availability");
+            System.out.println("7. LogOut");
             System.out.println("0. Exit");
             System.out.print("Choice: ");
             String choice = kb.nextLine().trim();
@@ -131,10 +187,6 @@ public class Main {
                         
                         System.out.print("Appointment ID: ");
                         String appointmentId = kb.nextLine().trim();
-                        System.out.print("User ID: ");
-                        String userId = kb.nextLine().trim();
-                        System.out.print("Status: ");
-                        String status = kb.nextLine().trim();
                         System.out.print("Service Name: ");
                         String serviceName = kb.nextLine().trim();
                         System.out.print("Requested Start (yyyy-MM-ddTHH:mm): ");
@@ -142,36 +194,20 @@ public class Main {
                         System.out.print("Requested End (yyyy-MM-ddTHH:mm): ");
                         LocalDateTime requestedEnd = LocalDateTime.parse(kb.nextLine().trim());
 
-                        if (selectedSchedule.verifySchedule(appointmentId, requestedStart, requestedEnd)) {
-                            selectedSchedule.bookAppointment(appointmentId, userId, status, serviceName, requestedStart, requestedEnd);
-                            selectedSchedule.selectTimeSlot(requestedStart, requestedEnd);
-                            System.out.println("Appointment booked successfully.");
-                            break;
-                        }else{
-                            System.out.println("Requested time slot is not available.");
-                            break;
-                        }
-                    // case "7":    
-                    //     System.out.print("Professional ID: ");
-                    //         String profId = kb.nextLine().trim();
-                    //         Schedule sched = schedules.get(profId);
-                    //         if (sched == null) {
-                    //             System.out.println("Professional not found.");
-                    //             break;
-                    //         }
-                    //         System.out.print("Start time (yyyy-MM-ddTHH:mm): ");
-                    //         LocalDateTime searchStart = LocalDateTime.parse(kb.nextLine().trim());
-                    //         System.out.print("End time (yyyy-MM-ddTHH:mm): ");
-                    //         LocalDateTime searchEnd = LocalDateTime.parse(kb.nextLine().trim());
-
-                    //         if (sched.verifySchedule("", searchStart, searchEnd)) {
-                    //             System.out.println("The time slot is available.");
-                    //         } else {
-                    //             System.out.println("The time slot is not available.");
-                    //         }
-                    //         break;
+                        String userId = currentUser.getUserId();
+                        Appointment request = selectedSchedule.requestAppointment(
+                                appointmentId, userId, serviceName, requestedStart, requestedEnd);
+                        selectedSchedule.updateSchedule(appointmentId, requestedStart, requestedEnd);
+                        selectedSchedule.bookAppointment(appointmentId, userId, request.getStatus(),
+                                serviceName, requestedStart, requestedEnd);
+                        System.out.println("Appointment booked successfully.");
+                        break;
+                    case "7":
+                        System.out.println("Logged out.");
+                        currentUser = null;
+                        break;
                     default:
-                        System.out.println("Choose 0, 1, 2, 3, 4, 5 or 6");
+                        System.out.println("Choose 0, 1, 2, 3, 4, 5, 6, or 7.");
                 }
             } catch (NoSuchFileException e) {
                 System.out.println("File not found: " + e.getFile());

@@ -1,6 +1,4 @@
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.ArrayList;
 
 public class Appointment {
     String appointmentId;
@@ -11,6 +9,7 @@ public class Appointment {
     LocalDateTime requestedEnd;
     LocalDateTime bookedAt;
     LocalDateTime arrivedAt;
+    private boolean scheduleUpdated;
 
     public Appointment(String appointmentId,String userId, String status, String serviceName, LocalDateTime requestedStart, LocalDateTime requestedEnd) {
         this.appointmentId = appointmentId;
@@ -19,8 +18,32 @@ public class Appointment {
         this.serviceName = serviceName;
         this.requestedStart = requestedStart;
         this.requestedEnd = requestedEnd;
-        this.bookedAt = LocalDateTime.now();
+        this.bookedAt = null;
         this.arrivedAt = null;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getBookedAt() {
+        return bookedAt;
+    }
+
+    void setBookedAt(LocalDateTime bookedAt) {
+        this.bookedAt = bookedAt;
+    }
+
+    boolean isScheduleUpdated() {
+        return scheduleUpdated;
+    }
+
+    void markScheduleUpdated() {
+        this.scheduleUpdated = true;
     }
 
 }
