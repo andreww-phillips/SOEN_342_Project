@@ -4,6 +4,7 @@ import java.util.*;
 public class Schedule {
     private final HealthcareProfessional professional;
     private final ArrayList<TimeSlot> timeSlots = new ArrayList<>();
+    private List <Appointment> appointments = new ArrayList<>();
 
     public Schedule(HealthcareProfessional professional) {
         this.professional = professional;
@@ -14,8 +15,8 @@ public class Schedule {
     }
 
     public List<TimeSlot> getTimeSlots() {
-    return timeSlots;
-}
+        return timeSlots;
+    }
 
     public void addTimeSlot(TimeSlot slot) {
         timeSlots.add(slot);
@@ -26,6 +27,16 @@ public class Schedule {
             if (slot.getStart().equals(start) && slot.getEnd().equals(end)) return true;
         }
         return false;
+    }
+
+    public void selectTimeSlot(LocalDateTime start, LocalDateTime end) {
+        for (TimeSlot slot : timeSlots) {
+            if (slot.getStart().equals(start) && slot.getEnd().equals(end)) {
+                slot.setIsAvailable(false);
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Time slot not found.");
     }
 
     public int makeAvailability(LocalDate from, LocalDate to, String repetitionPattern, Set<DayOfWeek> weekdays, LocalTime start, LocalTime end) {
@@ -51,5 +62,19 @@ public class Schedule {
             }
         }
         return count;
+    }
+    public boolean verifySchedule(String appointmentId, LocalDateTime start, LocalDateTime end) {
+        for (TimeSlot slot : timeSlots) {
+            if (slot.isAvailable && slot.getStart().equals(start) && slot.getEnd().equals(end)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+     public Appointment bookAppointment(String appointmentId, String userId, String status, String serviceName, LocalDateTime requestedStart, LocalDateTime requestedEnd) {
+        Appointment appointment = new Appointment(appointmentId, userId, status, serviceName, requestedStart, requestedEnd);
+        appointments.add(appointment);
+        return appointment;
     }
 }

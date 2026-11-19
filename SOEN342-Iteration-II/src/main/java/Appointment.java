@@ -4,27 +4,23 @@ import java.util.ArrayList;
 
 public class Appointment {
     String appointmentId;
+    String userId;
     String status;
+    String serviceName;
     LocalDateTime requestedStart;
     LocalDateTime requestedEnd;
     LocalDateTime bookedAt;
     LocalDateTime arrivedAt;
 
-    List <Appointment> appointments = new ArrayList<>();
-
-    public Appointment(String appointmentId, String status, LocalDateTime requestedStart, LocalDateTime requestedEnd, LocalDateTime bookedAt) {
+    public Appointment(String appointmentId,String userId, String status, String serviceName, LocalDateTime requestedStart, LocalDateTime requestedEnd) {
         this.appointmentId = appointmentId;
+        this.userId = userId;
         this.status = status;
+        this.serviceName = serviceName;
         this.requestedStart = requestedStart;
         this.requestedEnd = requestedEnd;
-        this.bookedAt = bookedAt;
+        this.bookedAt = LocalDateTime.now();
         this.arrivedAt = null;
-    }
-
-    public Appointment bookAppointment(String appointmentId, String userId, String status, String serviceName, LocalDateTime requestedStart, LocalDateTime requestedEnd) {
-        Appointment appointment = new Appointment(appointmentId, status, requestedStart, requestedEnd, bookedAt);
-        appointments.add(appointment);
-        return appointment;
     }
 
 }

@@ -16,6 +16,7 @@ public class Main {
             System.out.println("4. Import from CSV");
             System.out.println("5. Export to CSV");
             System.out.println("6. Book appointment");
+            // System.out.println("7. Search Availability");
             System.out.println("0. Exit");
             System.out.print("Choice: ");
             String choice = kb.nextLine().trim();
@@ -120,11 +121,57 @@ public class Main {
                     }
 
                     case "6":
+                        System.out.print("Professional ID: ");
+                        String professionalId = kb.nextLine().trim();
+                        Schedule selectedSchedule = schedules.get(professionalId);
+                        if (selectedSchedule == null) {
+                            System.out.println("Professional not found.");
+                            break;
+                        }
                         
-                        break;
+                        System.out.print("Appointment ID: ");
+                        String appointmentId = kb.nextLine().trim();
+                        System.out.print("User ID: ");
+                        String userId = kb.nextLine().trim();
+                        System.out.print("Status: ");
+                        String status = kb.nextLine().trim();
+                        System.out.print("Service Name: ");
+                        String serviceName = kb.nextLine().trim();
+                        System.out.print("Requested Start (yyyy-MM-ddTHH:mm): ");
+                        LocalDateTime requestedStart = LocalDateTime.parse(kb.nextLine().trim());
+                        System.out.print("Requested End (yyyy-MM-ddTHH:mm): ");
+                        LocalDateTime requestedEnd = LocalDateTime.parse(kb.nextLine().trim());
 
+                        if (selectedSchedule.verifySchedule(appointmentId, requestedStart, requestedEnd)) {
+                            selectedSchedule.bookAppointment(appointmentId, userId, status, serviceName, requestedStart, requestedEnd);
+                            selectedSchedule.selectTimeSlot(requestedStart, requestedEnd);
+                            System.out.println("Appointment booked successfully.");
+                            break;
+                        }else{
+                            System.out.println("Requested time slot is not available.");
+                            break;
+                        }
+                    // case "7":    
+                    //     System.out.print("Professional ID: ");
+                    //         String profId = kb.nextLine().trim();
+                    //         Schedule sched = schedules.get(profId);
+                    //         if (sched == null) {
+                    //             System.out.println("Professional not found.");
+                    //             break;
+                    //         }
+                    //         System.out.print("Start time (yyyy-MM-ddTHH:mm): ");
+                    //         LocalDateTime searchStart = LocalDateTime.parse(kb.nextLine().trim());
+                    //         System.out.print("End time (yyyy-MM-ddTHH:mm): ");
+                    //         LocalDateTime searchEnd = LocalDateTime.parse(kb.nextLine().trim());
+
+                    //         if (sched.verifySchedule("", searchStart, searchEnd)) {
+                    //             System.out.println("The time slot is available.");
+                    //         } else {
+                    //             System.out.println("The time slot is not available.");
+                    //         }
+                    //         break;
                     default:
-                        System.out.println("Choose 0, 1, 2, 3, 4, 5, or 6.");
+                        System.out.println("Choose 0, 1, 2, 3, 4, 5 or 6");
                 }
             } catch (NoSuchFileException e) {
                 System.out.println("File not found: " + e.getFile());
