@@ -1,7 +1,10 @@
+import java.util.*;
+
 public class HealthcareProfessional extends User {
     private final String professionalId;
     private final String name;
     private final String profession;
+    private final List<Specialty> specialties = new ArrayList<>();
 
     public HealthcareProfessional(String id, String name, String profession) {
         super(id); 
@@ -20,5 +23,15 @@ public class HealthcareProfessional extends User {
 
     public String getProfession() {
         return profession;
+    }
+
+    public List<Specialty> getSpecialties() {
+        return specialties;
+    }
+
+    public void addSpecialty(Specialty specialty) {
+        if (!specialties.contains(specialty)) {
+            specialties.add(specialty);
+        }
     }
 }

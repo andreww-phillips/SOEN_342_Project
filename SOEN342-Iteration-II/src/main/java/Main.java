@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.nio.file.*;
 import java.time.*;
 import java.util.*;
 
@@ -11,6 +13,9 @@ public class Main {
             System.out.println("\n1. Add/select professional");
             System.out.println("2. Make availability");
             System.out.println("3. View all availability");
+            System.out.println("4. Import from CSV");
+            System.out.println("5. Export to CSV");
+            System.out.println("6. Book appointment");
             System.out.println("0. Exit");
             System.out.print("Choice: ");
             String choice = kb.nextLine().trim();
@@ -43,7 +48,7 @@ public class Main {
 
                     case "2":
                         if (schedules.isEmpty()) {
-                            System.out.println("Add a professional first (CSV import will supply these later once the csv files are complete).");
+                            System.out.println("Add a professional first, or import them from a CSV (option 4).");
                             break;
                         }
                         for (Schedule s : schedules.values()) {
@@ -84,9 +89,47 @@ public class Main {
                         }
                         break;
 
+                    case "4": {
+                        System.out.print("CSV file to import: ");
+                        Path source = Paths.get(kb.nextLine().replace("\"", "").trim());
+                        CsvHandler.ImportResult result = CsvHandler.importFrom(source, schedules);
+                        System.out.println("Imported " + result.slotsImported + " time slots from " + result.rowsRead
+                                + " rows; " + result.professionalsAdded + " new professionals.");
+                        if (result.duplicatesSkipped > 0) {
+                            System.out.println("Skipped " + result.duplicatesSkipped + " duplicate time slots.");
+                        }
+                        if (!result.errors.isEmpty()) {
+                            System.out.println(result.errors.size() + " rows could not be imported:");
+                            for (String error : result.errors) System.out.println("  " + error);
+                        }
+                        break;
+                    }
+
+                    case "5": {
+                        System.out.print("CSV file to export to: ");
+                        Path target = Paths.get(kb.nextLine().replace("\"", "").trim());
+                        if (Files.exists(target)) {
+                            System.out.print("File exists. Overwrite? (y/n): ");
+                            if (!kb.nextLine().trim().equalsIgnoreCase("y")) {
+                                System.out.println("Export cancelled.");
+                                break;
+                            }
+                        }
+                        System.out.println("Exported " + CsvHandler.exportTo(target, schedules) + " time slots.");
+                        break;
+                    }
+
+                    case "6":
+                        
+                        break;
+
                     default:
-                        System.out.println("Choose 0, 1, 2, or 3.");
+                        System.out.println("Choose 0, 1, 2, 3, 4, 5, or 6.");
                 }
+            } catch (NoSuchFileException e) {
+                System.out.println("File not found: " + e.getFile());
+            } catch (IOException | InvalidPathException e) {
+                System.out.println("File error: " + e.getMessage());
             } catch (DateTimeException e) {
                 System.out.println("Invalid date or time. Please enter dates as yyyy-MM-dd and times as HH:mm.");
             } catch (IllegalArgumentException e) {
