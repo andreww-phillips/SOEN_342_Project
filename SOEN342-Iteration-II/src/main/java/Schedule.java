@@ -17,9 +17,15 @@ public class Schedule {
     return timeSlots;
 }
 
-    // CSV import can use this same method to add imported slots later.
     public void addTimeSlot(TimeSlot slot) {
         timeSlots.add(slot);
+    }
+
+    public boolean hasTimeSlot(LocalDateTime start, LocalDateTime end) {
+        for (TimeSlot slot : timeSlots) {
+            if (slot.getStart().equals(start) && slot.getEnd().equals(end)) return true;
+        }
+        return false;
     }
 
     public int makeAvailability(LocalDate from, LocalDate to, String repetitionPattern, Set<DayOfWeek> weekdays, LocalTime start, LocalTime end) {
